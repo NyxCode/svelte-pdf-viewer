@@ -34,6 +34,7 @@
 	}
 
 	onMount(() => {
+		console.info("Document.svelte: onMount")
 		resizeObserver.observe(wrapper, () => {});
 		currentPageObserver = new CurrentPageObserver(wrapper, currentPage, shouldLoad);
 
@@ -45,7 +46,9 @@
 	bind:this={wrapper}
 	class="flex flex-col w-full max-w-full overflow-auto pages-scrollbar scroll-smooth"
 >
-	{#each $pages as page}
-		<Page bind:this={page.component} bind:page {currentPageObserver} />
-	{/each}
+	{#if currentPageObserver != null}
+		{#each $pages as page}
+			<Page bind:this={page.component} bind:page {currentPageObserver} />
+		{/each}
+	{/if}
 </div>

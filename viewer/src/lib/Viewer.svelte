@@ -8,7 +8,8 @@
 	import type { Context, PageData } from './types';
 	import { SimpleResizeObserver } from './observers';
 	import { browser } from '$app/env';
-	import { MockBackend } from './backend/mock';
+	import { PdfiumBackend } from './backend/pdfium';
+	import type { PdfDocument, PdfPage } from './backend/backend';
 
 	let drawer = true;
 	let documentWidget: Document;
@@ -16,34 +17,42 @@
 
 	const pageWidth = writable(500);
 	const currentPage = writable(0);
-	const backend = new MockBackend();
+	const document = writable<PdfDocument>(null!);
+	const backend = new PdfiumBackend();
 
 	let ctx: Context = {
-		pages: writable(
-			Array.from(Array(24).keys()).map(
-				(index) =>
-					({
-						index,
-						element: null,
-						thumbnailUrl: null,
-						thumbnailElement: null,
-						aspectRatio: 1.41,
-						component: null!
-					} as PageData)
-			)
-		),
+		pages: writable([]),
 		currentPage,
 		drawerWidth: 18,
 		pageWidth,
 		resizeObserver: browser ? new SimpleResizeObserver() : null!,
-		document: null!,
+		document,
 		shouldLoad: writable(new Set())
 	};
 	setContext<Context>(CONTEXT, ctx);
 
 	onMount(async () => {
 		$pageWidth = wrapper.offsetWidth * 0.66;
-		ctx.document = await backend.loadDocument('/');
+		await backend.initialize();
+		$document = await backend.loadDocument('/example.pdf');
+		console.error(ctx.document);
+
+		let pages = await $document.getPages();
+		let thumbnails = await $document.getThumbnails();
+
+		const makePage = (index: number) =>
+			({
+				index,
+				element: null,
+				thumbnailElement: null,
+				component: null,
+				pdfPage: pages[index],
+				pdfThumbnail: thumbnails[index]
+			} as PageData);
+
+		let pageData = Array.from(Array(pages.length).keys()).map(makePage);
+
+		ctx.pages.set(pageData);
 	});
 
 	function goto({ detail: { page, hard } }: { detail: { page: number; hard: true } }) {

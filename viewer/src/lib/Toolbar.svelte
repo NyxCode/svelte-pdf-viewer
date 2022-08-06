@@ -5,6 +5,11 @@
 	import Printer from 'svelte-material-icons/Printer.svelte';
 	import ToolbarButton from './ToolbarButton.svelte';
 	import CurrentPageInput from './CurrentPageInput.svelte';
+	import { getContext } from 'svelte';
+	import { CONTEXT } from './utils';
+	import type { Context } from './types';
+
+	const { pages, document } = getContext<Context>(CONTEXT);
 
 	export let drawer: boolean;
 </script>
@@ -20,18 +25,20 @@
 	</div>
 
 	<div class="flex flex-row items-center text-sm">
-		<CurrentPageInput on:goto />
-		<span class="ml-1">/ 24</span>
+		{#if $pages.length > 0}
+			<CurrentPageInput on:goto />
+			<span class="ml-1">/ {$pages.length}</span>
+		{/if}
 	</div>
 
 	<div class="flex flex-row gap-x-1">
-		<ToolbarButton>
+		<ToolbarButton on:click={() => $document.download()}>
 			<Download size="1.5em" />
 		</ToolbarButton>
-		<ToolbarButton>
+		<ToolbarButton on:click={() => $document.print()}>
 			<Printer size="1.5em" />
 		</ToolbarButton>
-		<ToolbarButton>
+		<ToolbarButton on:click={() => alert('not implemented')}>
 			<DotsVertical size="1.5em" />
 		</ToolbarButton>
 	</div>

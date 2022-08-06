@@ -7,9 +7,9 @@
 	export let page: PageData;
 	export let currentPageObserver: CurrentPageObserver;
 
-	const { pageWidth, document } = getContext<Context>(CONTEXT);
+	const { pageWidth, shouldLoad } = getContext<Context>(CONTEXT);
 
-	$: height = $pageWidth * (page.aspectRatio || 1.41421);
+	$: height = $pageWidth  / page.aspectRatio;
 	$: style = `
 			width: ${$pageWidth}px;
 			height: ${height}px;
@@ -19,18 +19,25 @@
 			max-height: ${height}px;
 		`;
 
-	$: currentPageObserver?.observe(page);
-
+	let rendered = false;
+	$: shouldRender = $shouldLoad.has(page.index);
+	
 	export function resize() {
 		if (page.element == null) return;
 		page.element.style.cssText = style;
+		page.pdfPage.resized($pageWidth);
+		rendered = false;
+	}
+	
+	$: if(shouldRender && !rendered) {
+		page.pdfPage.render($pageWidth);
+		rendered = true;
 	}
 
 	onMount(async () => {
+		currentPageObserver.observe(page);
+		await page.pdfPage.initialize(page.element!);
 		resize();
-		let pdfPage = await document.getPage(page.index);
-		await pdfPage.initialize(page.element!);
-		await pdfPage.render();
 	});
 </script>
 

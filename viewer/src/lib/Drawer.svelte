@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { CONTEXT, slide } from './utils';
-	import { getContext } from 'svelte';
+	import {getContext, onMount} from 'svelte';
 	import type { Context } from './types';
 	import Thumbnail from './Thumbnail.svelte';
 
@@ -39,6 +39,10 @@
 			wrapper.scrollTop = thumbnail.offsetTop;
 		}
 	}
+	
+	onMount(() => {
+		console.info("Drawer.svelte: onMount")
+	})
 </script>
 
 <div transition:slide={{ em: drawerWidth }} {style} class="overflow-hidden">
