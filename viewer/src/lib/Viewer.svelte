@@ -9,7 +9,7 @@
 	import { SimpleResizeObserver } from './observers';
 	import { browser } from '$app/env';
 	import { PdfiumBackend } from './backend/pdfium';
-	import type { PdfDocument, PdfPage } from './backend/backend';
+	import type { PdfDocument } from './backend/backend';
 
 	let drawer = true;
 	let documentWidget: Document;
@@ -45,7 +45,7 @@
 				index,
 				element: null,
 				thumbnailElement: null,
-				component: null,
+				component: null!,
 				pdfPage: pages[index],
 				pdfThumbnail: thumbnails[index]
 			} as PageData);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Context, PageData } from './types';
-	import { createEventDispatcher, getContext, onMount, tick } from 'svelte';
+	import { createEventDispatcher, getContext, onMount } from 'svelte';
 	import { CONTEXT } from './utils';
 
 	export let page: PageData;
@@ -24,10 +24,7 @@
 		width = wrapper.clientWidth;
 		await page.pdfThumbnail.initialize(wrapper);
 		await page.pdfThumbnail.resized(width);
-		await tick();
-		setTimeout(() => {
-			page.pdfThumbnail.render(width);
-		}, 0);
+		await page.pdfThumbnail.render(width);
 	});
 </script>
 

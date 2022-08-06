@@ -2,14 +2,14 @@
 	import { getContext, onMount } from 'svelte';
 	import type { Context, PageData } from './types';
 	import { CONTEXT } from './utils';
-	import { CurrentPageObserver } from './observers';
+	import type { CurrentPageObserver } from './observers';
 
 	export let page: PageData;
 	export let currentPageObserver: CurrentPageObserver;
 
 	const { pageWidth, shouldLoad } = getContext<Context>(CONTEXT);
 
-	$: height = $pageWidth  / page.aspectRatio;
+	$: height = $pageWidth / page.pdfPage.aspectRatio;
 	$: style = `
 			width: ${$pageWidth}px;
 			height: ${height}px;
@@ -21,15 +21,15 @@
 
 	let rendered = false;
 	$: shouldRender = $shouldLoad.has(page.index);
-	
+
 	export function resize() {
 		if (page.element == null) return;
 		page.element.style.cssText = style;
 		page.pdfPage.resized($pageWidth);
 		rendered = false;
 	}
-	
-	$: if(shouldRender && !rendered) {
+
+	$: if (shouldRender && !rendered) {
 		page.pdfPage.render($pageWidth);
 		rendered = true;
 	}
