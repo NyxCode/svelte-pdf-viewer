@@ -1,14 +1,9 @@
 import type { PdfBackend, PdfDocument, PdfPage } from './backend';
-import { browser } from '$app/env';
 import * as Comlink from 'comlink';
 import type { RenderResult } from './pdfium-worker';
 
 export class PdfiumBackend implements PdfBackend {
 	private workerBackend: any = null;
-
-	constructor() {
-		console.error('BROWSER:', browser);
-	}
 
 	async initialize(): Promise<void> {
 		// importing it as non-module works like this:
@@ -89,7 +84,6 @@ export class PdfiumPage implements PdfPage {
 		this.canvas.style.transform = '';
 		this.canvas.width = result.width;
 		this.canvas.height = result.height;
-		console.warn('updating canvas', this.index);
 		ctx.putImageData(result.imageData, 0, 0, 0, 0, result.width, result.height);
 	}
 

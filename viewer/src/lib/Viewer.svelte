@@ -6,8 +6,6 @@
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import type { Context, PageData } from './types';
-	import { SimpleResizeObserver } from './observers';
-	import { browser } from '$app/env';
 	import { PdfiumBackend } from './backend/pdfium';
 	import type { PdfDocument } from './backend/backend';
 
@@ -25,7 +23,6 @@
 		currentPage,
 		drawerWidth: 18,
 		pageWidth,
-		resizeObserver: browser ? new SimpleResizeObserver() : null!,
 		document,
 		shouldLoad: writable(new Set())
 	};

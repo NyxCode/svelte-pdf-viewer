@@ -10,8 +10,7 @@
 
 	let wrapper: HTMLDivElement;
 
-	$: isCurrent = $currentPage == page.index;
-	$: imgClasses = isCurrent ? '!border-blue-400' : 'border-transparent';
+	$: imgClasses = $currentPage == page.index ? '!border-blue-400' : 'border-transparent';
 
 	function onClick() {
 		dispatch('goto', { page: page.index });

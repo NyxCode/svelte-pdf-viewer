@@ -69,37 +69,3 @@ export class CurrentPageObserver {
 		this.currentPageStore.set(current);
 	}
 }
-
-export class SimpleResizeObserver {
-	private observer: ResizeObserver;
-	private listener: Map<Element, () => void>;
-
-	constructor() {
-		this.observer = new ResizeObserver((entries) => {
-			entries.forEach((e) => this.on(e));
-		});
-		this.listener = new Map();
-	}
-
-	observe(element: Element, callback: () => void) {
-		if (this.listener.get(element) != null) {
-			console.warn('replacing existing listener for', element);
-		}
-		this.listener.set(element, callback);
-		this.observer.observe(element);
-	}
-
-	unobserve(element: Element) {
-		this.observer.unobserve(element);
-		this.listener.delete(element);
-	}
-
-	destroy() {
-		this.listener.clear();
-		this.observer.disconnect();
-	}
-
-	private on(entry: ResizeObserverEntry) {
-		this.listener.get(entry.target)?.call(null);
-	}
-}

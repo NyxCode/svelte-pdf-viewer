@@ -38,6 +38,8 @@
 		currentPageObserver.observe(page);
 		await page.pdfPage.initialize(page.element!);
 		resize();
+
+		return () => currentPageObserver?.unobserve(page);
 	});
 </script>
 

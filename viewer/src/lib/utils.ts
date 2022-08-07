@@ -1,7 +1,6 @@
 import { quintOut } from 'svelte/easing';
 
 export const CONTEXT = Symbol('svelte-pdf-viewer');
-export const PAGE_INDEX_ATTRIBUTE = 'data-page-index';
 
 export const slide = (_node: HTMLElement, params: { em: number }) => ({
 	delay: 0,

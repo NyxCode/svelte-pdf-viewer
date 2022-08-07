@@ -15,7 +15,7 @@ function getWasmTable(pdfium: { wasmTable: () => any }): Promise<any> {
 			let wasmTable = pdfium.wasmTable();
 			if (wasmTable != undefined) {
 				clearInterval(interval);
-				console.error(`'wasmTable' found after ${waited}ms`);
+				console.info(`'wasmTable' found after ${waited}ms`);
 				resolve(wasmTable);
 			} else if (waited > max) {
 				clearTimeout(interval);
@@ -29,17 +29,13 @@ function getWasmTable(pdfium: { wasmTable: () => any }): Promise<any> {
 class PdfiumWorkerBackend {
 	private renderer: PdfiumWasmRenderer | null = null;
 
-	constructor() {
-		console.error('backend created:', self);
-	}
-
 	async initialize(): Promise<void> {
 		(<any>self).wasmTable = await getWasmTable(pdfium);
 
 		let initOut = await init();
 		initialize_pdfium_render(pdfium.Module, initOut, false);
 		this.renderer = new PdfiumWasmRenderer(MAX_WIDTH, MAX_HEIGHT);
-		console.error('backend initialized!');
+		console.info('Pdfium worker successfully initialized');
 	}
 
 	async loadDocument(url: string): Promise<PdfiumWorkerDocument> {
@@ -85,10 +81,7 @@ class PdfiumWorkerPage {
 		width = Math.floor(width);
 		let height = Math.floor(width / this.aspectRatio);
 
-		console.error('rendering page', this.index);
-
 		if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-			console.error('aboring render, too big');
 			return null;
 		}
 
@@ -97,7 +90,7 @@ class PdfiumWorkerPage {
 			this.index,
 			width,
 			(buffer: Uint8ClampedArray, buffer_width: number, _buffer_height: number) => {
-				//let buffer_part = buffer.subarray(0, buffer_width * this.height * 4);
+				// TODO: maybe remove this copy?
 				let buffer_part = buffer.slice(0, buffer_width * height * 4);
 				let imageData = new ImageData(buffer_part, buffer_width, height);
 

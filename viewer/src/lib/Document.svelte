@@ -7,7 +7,7 @@
 
 	let wrapper: HTMLDivElement;
 	let currentPageObserver: CurrentPageObserver;
-	let { pages, currentPage, resizeObserver, shouldLoad, pageWidth } = getContext<Context>(CONTEXT);
+	let { pages, currentPage, shouldLoad, pageWidth } = getContext<Context>(CONTEXT);
 
 	export function goto(page: number, hard: boolean = false) {
 		let nth = wrapper.children.item(page)! as HTMLDivElement;
@@ -23,7 +23,7 @@
 
 	export async function zoom(deltaY: number) {
 		let relScrollY = getScrollRatio(wrapper, 'y');
-		$pageWidth = clamp($pageWidth - deltaY, { min: 50, max: 10000 });
+		$pageWidth = clamp($pageWidth - deltaY, { min: 50, max: 50000 });
 		await tick();
 		$pages.forEach((p) => p.component.resize());
 
@@ -34,8 +34,6 @@
 	}
 
 	onMount(() => {
-		console.info("Document.svelte: onMount")
-		resizeObserver.observe(wrapper, () => {});
 		currentPageObserver = new CurrentPageObserver(wrapper, currentPage, shouldLoad);
 
 		return () => currentPageObserver.destroy();

@@ -23,6 +23,4 @@ export interface Context {
 
 	pageWidth: Writable<number>;
 	drawerWidth: number;
-
-	resizeObserver: SimpleResizeObserver;
 }
