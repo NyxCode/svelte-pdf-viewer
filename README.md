@@ -35,7 +35,13 @@
 - [ ] plug-and-play renderers
 - [ ] make extendable 
 - [ ] annotations
+- [ ] streamline build [^1]
 
 ## bugs
 - [x] thumbnails sometimes render at the wrong size
 - [x] pages flicker on when zooming
+
+
+[^1]:  Currently, getting the thing to build is a pain due to the emscripten-generated `pdfium-js.js` and `pdfium.wasm`.  
+  `pdfium.wasm` is duplicated, once in `src/lib/backend/` and once in `/static/assets` since vite seems to be fine with 
+  the first one (in dev), but rollup needs the 2nd one (when building).
