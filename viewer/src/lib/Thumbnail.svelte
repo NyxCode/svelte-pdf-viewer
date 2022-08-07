@@ -32,9 +32,8 @@
 	on:dragstart|preventDefault
 >
 	<div
-		class="w-full min-w-full max-w-full box-border cursor-pointer border-[6px] hover:border-zinc-600 {imgClasses}"
+		class="box-border cursor-pointer border-[6px] width-[196px] hover:border-zinc-600 {imgClasses}"
 		on:click={onClick}
-		style="min-height: {height}px"
 		bind:this={wrapper}
 	/>
 	{page.index + 1}
