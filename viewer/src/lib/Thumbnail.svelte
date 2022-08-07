@@ -32,7 +32,7 @@
 	on:dragstart|preventDefault
 >
 	<div
-		class="box-border cursor-pointer border-[6px] width-[196px] hover:border-zinc-600 {imgClasses}"
+		class="box-border cursor-pointer border-[6px] w-[192px] hover:border-zinc-600 {imgClasses}"
 		on:click={onClick}
 		bind:this={wrapper}
 	/>
