@@ -2,7 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export function __wbg_pdfiumwasmrenderer_free(a: number): void;
-export function pdfiumwasmrenderer_new(a: number): void;
+export function pdfiumwasmrenderer_new(a: number, b: number, c: number): void;
 export function pdfiumwasmrenderer_load_document(a: number, b: number, c: number, d: number): void;
 export function __wbg_pdfiumwasmdocument_free(a: number): void;
 export function pdfiumwasmdocument_pages(a: number): number;

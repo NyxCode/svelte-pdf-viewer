@@ -1,6 +1,7 @@
 import type { PdfBackend, PdfDocument, PdfPage } from './backend';
 import { browser } from '$app/env';
 import * as Comlink from 'comlink';
+import type { RenderResult } from './pdfium-worker';
 
 export class PdfiumBackend implements PdfBackend {
 	private workerBackend: any = null;
@@ -64,8 +65,7 @@ export class PdfiumPage implements PdfPage {
 	private readonly index: number;
 	private canvas: HTMLCanvasElement | null = null;
 	readonly aspectRatio: number;
-
-	private lastRender: number = 0;
+	private epoch: number = 0;
 
 	constructor(index: number, worker: any, aspectRatio: number) {
 		this.worker = worker;
@@ -81,19 +81,16 @@ export class PdfiumPage implements PdfPage {
 
 	async render(width: number): Promise<void> {
 		if (this.canvas == null) return;
-		this.lastRender++;
-		let epoch = this.lastRender;
+		let epoch = ++this.epoch;
 
-		let imageData: ImageData = await this.worker.render(width);
-		if (epoch < this.lastRender) {
-			console.error("aborting render, it's old");
-			return;
-		}
+		let result: RenderResult = await this.worker.render(width);
+		if (result == null || this.epoch != epoch) return;
 		let ctx = this.canvas!.getContext('2d')!;
 		this.canvas.style.transform = '';
-		this.canvas.width = imageData.width;
-		this.canvas.height = imageData.height;
-		ctx.putImageData(imageData, 0, 0);
+		this.canvas.width = result.width;
+		this.canvas.height = result.height;
+		console.warn('updating canvas', this.index);
+		ctx.putImageData(result.imageData, 0, 0, 0, 0, result.width, result.height);
 	}
 
 	async resized(width: number): Promise<void> {

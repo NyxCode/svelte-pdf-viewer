@@ -69,8 +69,10 @@ export class PdfiumWasmPageSize {
 export class PdfiumWasmRenderer {
   free(): void;
 /**
+* @param {number} max_width
+* @param {number} max_height
 */
-  constructor();
+  constructor(max_width: number, max_height: number);
 /**
 * @param {Uint8Array} bytes
 * @returns {PdfiumWasmDocument}
@@ -83,7 +85,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_pdfiumwasmrenderer_free: (a: number) => void;
-  readonly pdfiumwasmrenderer_new: (a: number) => void;
+  readonly pdfiumwasmrenderer_new: (a: number, b: number, c: number) => void;
   readonly pdfiumwasmrenderer_load_document: (a: number, b: number, c: number, d: number) => void;
   readonly __wbg_pdfiumwasmdocument_free: (a: number) => void;
   readonly pdfiumwasmdocument_pages: (a: number) => number;

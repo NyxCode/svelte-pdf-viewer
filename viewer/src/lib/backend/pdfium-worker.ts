@@ -2,6 +2,9 @@ import init, { initialize_pdfium_render, PdfiumWasmDocument, PdfiumWasmRenderer 
 import * as Comlink from 'comlink';
 import pdfium from './pdfium-js.js';
 
+const MAX_WIDTH = 3000;
+const MAX_HEIGHT = 3000;
+
 function getWasmTable(pdfium: { wasmTable: () => any }): Promise<any> {
 	return new Promise((resolve, reject) => {
 		let max = 10000;
@@ -35,7 +38,7 @@ class PdfiumWorkerBackend {
 
 		let initOut = await init();
 		initialize_pdfium_render(pdfium.Module, initOut, false);
-		this.renderer = new PdfiumWasmRenderer();
+		this.renderer = new PdfiumWasmRenderer(MAX_WIDTH, MAX_HEIGHT);
 		console.error('backend initialized!');
 	}
 
@@ -78,19 +81,43 @@ class PdfiumWorkerPage {
 		this.aspectRatio = size.width / size.height;
 	}
 
-	render(width: number): Promise<ImageData> {
+	render(width: number): RenderResult {
+		width = Math.floor(width);
+		let height = Math.floor(width / this.aspectRatio);
+
 		console.error('rendering page', this.index);
-		return new Promise((resolve) => {
-			this.doc.render_page(
-				this.index,
-				width,
-				(buffer: Uint8ClampedArray, width: number, height: number) => {
-					let imageData = new ImageData(buffer, width, height);
-					resolve(imageData);
-				}
-			);
-		});
+
+		if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+			console.error('aboring render, too big');
+			return null;
+		}
+
+		let result = null;
+		this.doc.render_page(
+			this.index,
+			width,
+			(buffer: Uint8ClampedArray, buffer_width: number, _buffer_height: number) => {
+				//let buffer_part = buffer.subarray(0, buffer_width * this.height * 4);
+				let buffer_part = buffer.slice(0, buffer_width * height * 4);
+				let imageData = new ImageData(buffer_part, buffer_width, height);
+
+				result = {
+					imageData,
+					width,
+					height,
+					index: this.index
+				};
+			}
+		);
+		return result;
 	}
 }
+
+export type RenderResult = {
+	imageData: ImageData;
+	width: number;
+	height: number;
+	index: number;
+} | null;
 
 Comlink.expose(PdfiumWorkerBackend);
