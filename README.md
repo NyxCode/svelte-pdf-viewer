@@ -8,6 +8,10 @@
 - [x] **Pdfium** *(using WASM through [pdfium-render](https://github.com/ajrcarey/pdfium-render))*
 - [ ] **PDF.js**
 
+## supported browsers
+- [x] **Chrome**
+- [ ] **Firefox** *(currently crashes after a few renders, possible due to a memory leak)*
+
 ## why is it so slow?
 - [x] only render visible pages
 - [ ] only render visible thumbnails

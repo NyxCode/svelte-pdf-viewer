@@ -4,7 +4,7 @@ import pdfium from './pdfium-js.js';
 
 function getWasmTable(pdfium: { wasmTable: () => any }): Promise<any> {
 	return new Promise((resolve, reject) => {
-		let max = 1000;
+		let max = 10000;
 		let duration = 10;
 		let waited = 0;
 
