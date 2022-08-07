@@ -17,13 +17,11 @@
 		dispatch('goto', { page: page.index });
 	}
 
-	let width = 0;
+	const width = 180;
 	$: height = width / page.pdfThumbnail.aspectRatio;
 
 	onMount(async () => {
-		width = wrapper.clientWidth;
 		await page.pdfThumbnail.initialize(wrapper);
-		await page.pdfThumbnail.resized(width);
 		await page.pdfThumbnail.render(width);
 	});
 </script>

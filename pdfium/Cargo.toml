@@ -19,8 +19,9 @@ js-sys = "0.3.59"
 console_error_panic_hook = { version = "0.1.6", optional = true }
 
 [dependencies.pdfium-render]
-git = "https://github.com/ajrcarey/pdfium-render"
+git = "https://github.com/NyxCode/pdfium-render"
 default-features = false
+branch = "use-in-web-worker"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"

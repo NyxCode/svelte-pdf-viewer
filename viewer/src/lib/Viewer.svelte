@@ -35,7 +35,6 @@
 		$pageWidth = wrapper.offsetWidth * 0.66;
 		await backend.initialize();
 		$document = await backend.loadDocument('/example.pdf');
-		console.error(ctx.document);
 
 		let pages = await $document.getPages();
 		let thumbnails = await $document.getThumbnails();

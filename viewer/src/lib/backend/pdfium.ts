@@ -1,32 +1,58 @@
 import type { PdfBackend, PdfDocument, PdfPage } from './backend';
 import init, { initialize_pdfium_render, PdfiumWasmDocument, PdfiumWasmRenderer } from 'pdfium';
+import { browser } from '$app/env';
+import * as Comlink from 'comlink';
 
 declare var Module: any;
 
 export class PdfiumBackend implements PdfBackend {
 	private renderer: PdfiumWasmRenderer | null = null;
+	private workerBackend: any = null;
 
-	constructor() {}
+	constructor() {
+		console.error('BROWSER:', browser);
+	}
 
 	async initialize(): Promise<void> {
+		console.time('PdfiumBackend: initialize');
+
+		// !non-module!
+		//new Worker(new URL('./pdfium-worker', import.meta.url));
+
+		// !Module!
+		let PdfiumWorker = await import('./pdfium-worker?worker');
+		let worker = new PdfiumWorker.default();
+		let workerBackend = Comlink.wrap(worker);
+		this.workerBackend = await new workerBackend();
+		await this.workerBackend.initialize();
+		/*
+		console.warn('A', workerBackend);
+		let instance = await new workerBackend();
+		console.warn('B', instance);
+		console.warn('C', await instance.initialize());
+		let doc = await instance.loadDocument('/example.pdf');
+		console.warn('D', doc);
+		let pages = await doc.getPages();
+		console.warn('E', pages);
+		let page = pages[0];
+		console.warn('F', page);
+		console.warn('G', await page.render(100));
+		
+		 */
+
 		let pdfiumModule = await initPdfium();
-		console.log('pdfium runtime initialized');
 		let initOut = await init();
-		console.log('wasm glue initialized');
 		initialize_pdfium_render(pdfiumModule, initOut, false);
-		console.log('pdfium initialized');
 		this.renderer = new PdfiumWasmRenderer();
-		console.log('renderer created');
+
+		console.timeEnd('PdfiumBackend: initialize');
 	}
 
 	async loadDocument(url: string): Promise<PdfDocument> {
-		let blob = await fetch(url).then((r) => r.blob());
-		let array = new Uint8Array(await blob.arrayBuffer());
-		console.log('loading document..');
-		let doc = this.renderer!.load_document(array);
-		console.log('creating PdfiumDocument');
-		let res = new PdfiumDocument(doc);
-		console.log('created PdfiumDocument');
+		console.time('PdfiumBackend: loadDocument');
+		let worker = await this.workerBackend.loadDocument(url);
+		let res = new PdfiumDocument(worker);
+		console.timeEnd('PdfiumBackend: loadDocument');
 		return res;
 	}
 }
@@ -51,12 +77,10 @@ function initPdfium(): Promise<any> {
 }
 
 export class PdfiumDocument implements PdfDocument {
-	private readonly doc: PdfiumWasmDocument;
-	private readonly pages: number;
+	private readonly worker: any;
 
-	constructor(doc: PdfiumWasmDocument) {
-		this.doc = doc;
-		this.pages = this.doc.pages();
+	constructor(worker: any) {
+		this.worker = worker;
 	}
 
 	async download(): Promise<void> {
@@ -64,7 +88,18 @@ export class PdfiumDocument implements PdfDocument {
 	}
 
 	async getPages(): Promise<PdfPage[]> {
-		return Array.from(Array(this.pages).keys()).map((i) => new PdfiumPage(i, this.doc));
+		console.time('PdfiumDocument: getPages');
+		let worker = await this.worker.getPages();
+
+		let result = [];
+		let pages: number = await worker.length;
+		for (let i = 0; i < pages; i++) {
+			let ar = await worker[i].aspectRatio;
+			let mapped = new PdfiumPage(i, worker[i], ar);
+			result[i] = mapped;
+		}
+
+		return result;
 	}
 
 	async print(): Promise<void> {
@@ -72,53 +107,54 @@ export class PdfiumDocument implements PdfDocument {
 	}
 
 	async getThumbnails(): Promise<PdfPage[]> {
-		return Array.from(Array(this.pages).keys()).map((i) => new PdfiumPage(i, this.doc));
+		return this.getPages();
 	}
 }
 
 export class PdfiumPage implements PdfPage {
-	readonly aspectRatio: number;
+	private readonly worker: any;
 	private readonly index: number;
-	private readonly doc: PdfiumWasmDocument;
 	private canvas: HTMLCanvasElement | null = null;
+	readonly aspectRatio: number;
 
-	constructor(index: number, doc: PdfiumWasmDocument) {
+	private lastRender: number = 0;
+
+	constructor(index: number, worker: any, aspectRatio: number) {
+		this.worker = worker;
 		this.index = index;
-		this.doc = doc;
-		let size = doc.page_size(index);
-		this.aspectRatio = size.width / size.height;
+		this.aspectRatio = aspectRatio;
 	}
 
 	async initialize(element: HTMLDivElement): Promise<void> {
-		let label = `PdfiumPage (${this.index}): initialize`;
-		console.time(label);
 		element.innerHTML = '';
 		this.canvas = document.createElement('canvas');
 		element.appendChild(this.canvas);
-		console.timeEnd(label);
 	}
 
 	async render(width: number): Promise<void> {
-		let label = `PdfiumPage (${this.index}): render`;
-		console.time(label);
-		this.doc.render_page(
-			this.index,
-			width,
-			(buffer: Uint8ClampedArray, width: number, height: number) => {
-				let ctx = this.canvas!.getContext('2d')!;
-				let imageData = new ImageData(buffer, width, height);
-				ctx.putImageData(imageData, 0, 0);
-			}
-		);
-		console.timeEnd(label);
+		if (this.canvas == null) return;
+		this.lastRender++;
+		let epoch = this.lastRender;
+
+		let imageData: ImageData = await this.worker.render(width);
+		if (epoch < this.lastRender) {
+			console.error("aborting render, it's old");
+			return;
+		}
+		let ctx = this.canvas!.getContext('2d')!;
+		this.canvas.style.transform = '';
+		this.canvas.width = imageData.width;
+		this.canvas.height = imageData.height;
+		ctx.putImageData(imageData, 0, 0);
 	}
 
 	async resized(width: number): Promise<void> {
 		if (this.canvas == null) return;
 		let label = `PdfiumPage (${this.index}): resized`;
-		console.time(label);
-		this.canvas.width = width;
-		this.canvas.height = width / this.aspectRatio;
-		console.timeEnd(label);
+		let scale = width / this.canvas.width;
+		this.canvas.style.transformOrigin = `0 0`;
+		this.canvas.style.transform = `scale(${scale})`;
+		// this.canvas.width = width;
+		// this.canvas.height = width / this.aspectRatio;
 	}
 }

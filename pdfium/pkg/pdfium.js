@@ -548,10 +548,6 @@ imports.wbg.__wbg_log_17733ab6fa45831d = function(arg0) {
 imports.wbg.__wbg_warn_ee027638ccb24e00 = function(arg0) {
     console.warn(getObject(arg0));
 };
-imports.wbg.__wbg_instanceof_Window_42f092928baaee84 = function(arg0) {
-    const ret = getObject(arg0) instanceof Window;
-    return ret;
-};
 imports.wbg.__wbg_get_ad41fee29b7e0f53 = function(arg0, arg1) {
     const ret = getObject(arg0)[arg1 >>> 0];
     return addHeapObject(ret);

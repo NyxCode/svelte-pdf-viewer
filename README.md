@@ -13,7 +13,7 @@
 - [ ] only render visible thumbnails
 - [ ] only render visible parts of pages when zooming
 - [ ] pdfium: re-use bitmap buffer
-- [ ] pdfium: render asynchronous in a webworker
+- [x] pdfium: render asynchronous in a webworker
 - [ ] pdfium: pre-load pdfium
 - [ ] preemptively render pages / thumbnails
 - [ ] preload PDF
@@ -33,3 +33,6 @@
 - [ ] plug-and-play renderers
 - [ ] make extendable 
 - [ ] annotations
+
+## bugs
+- [x] thumbnails sometimes render at the wrong size
