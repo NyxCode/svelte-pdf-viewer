@@ -13,6 +13,7 @@
 - [ ] only render visible thumbnails
 - [ ] only render visible parts of pages when zooming
 - [ ] pdfium: re-use bitmap buffer
+- [ ] implement rendering queue to discard outdated requests
 - [x] pdfium: render asynchronous in a webworker
 - [ ] pdfium: pre-load pdfium
 - [ ] preemptively render pages / thumbnails
@@ -20,8 +21,9 @@
 
 ## todo
 - [ ] text layer
-- [ ] Display title or filename
+- [ ] display title or filename
 - [ ] download
+- [ ] loading animation/indicator
 - [ ] print
 - [ ] rotate
 - [ ] progress bar
@@ -36,3 +38,4 @@
 
 ## bugs
 - [x] thumbnails sometimes render at the wrong size
+- [x] pages flicker on when zooming

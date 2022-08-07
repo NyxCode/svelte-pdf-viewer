@@ -1,12 +1,8 @@
 import type { PdfBackend, PdfDocument, PdfPage } from './backend';
-import init, { initialize_pdfium_render, PdfiumWasmDocument, PdfiumWasmRenderer } from 'pdfium';
 import { browser } from '$app/env';
 import * as Comlink from 'comlink';
 
-declare var Module: any;
-
 export class PdfiumBackend implements PdfBackend {
-	private renderer: PdfiumWasmRenderer | null = null;
 	private workerBackend: any = null;
 
 	constructor() {
@@ -14,66 +10,20 @@ export class PdfiumBackend implements PdfBackend {
 	}
 
 	async initialize(): Promise<void> {
-		console.time('PdfiumBackend: initialize');
-
-		// !non-module!
+		// importing it as non-module works like this:
 		//new Worker(new URL('./pdfium-worker', import.meta.url));
 
-		// !Module!
 		let PdfiumWorker = await import('./pdfium-worker?worker');
 		let worker = new PdfiumWorker.default();
-		let workerBackend = Comlink.wrap(worker);
+		let workerBackend = Comlink.wrap(worker) as any;
 		this.workerBackend = await new workerBackend();
 		await this.workerBackend.initialize();
-		/*
-		console.warn('A', workerBackend);
-		let instance = await new workerBackend();
-		console.warn('B', instance);
-		console.warn('C', await instance.initialize());
-		let doc = await instance.loadDocument('/example.pdf');
-		console.warn('D', doc);
-		let pages = await doc.getPages();
-		console.warn('E', pages);
-		let page = pages[0];
-		console.warn('F', page);
-		console.warn('G', await page.render(100));
-		
-		 */
-
-		let pdfiumModule = await initPdfium();
-		let initOut = await init();
-		initialize_pdfium_render(pdfiumModule, initOut, false);
-		this.renderer = new PdfiumWasmRenderer();
-
-		console.timeEnd('PdfiumBackend: initialize');
 	}
 
 	async loadDocument(url: string): Promise<PdfDocument> {
-		console.time('PdfiumBackend: loadDocument');
 		let worker = await this.workerBackend.loadDocument(url);
-		let res = new PdfiumDocument(worker);
-		console.timeEnd('PdfiumBackend: loadDocument');
-		return res;
+		return new PdfiumDocument(worker);
 	}
-}
-
-function initPdfium(): Promise<any> {
-	let resolve: (pdfiumModule: any) => void;
-	let promise = new Promise((_resolve, _reject) => {
-		resolve = _resolve;
-	});
-
-	let script = document.createElement('script');
-	script.onload = () => {
-		console.log('pdfium script loaded');
-		Module.onRuntimeInitialized = () => {
-			resolve(Module);
-		};
-	};
-	script.src = '/pdfium.js';
-	document.head.appendChild(script);
-
-	return promise;
 }
 
 export class PdfiumDocument implements PdfDocument {
@@ -88,15 +38,13 @@ export class PdfiumDocument implements PdfDocument {
 	}
 
 	async getPages(): Promise<PdfPage[]> {
-		console.time('PdfiumDocument: getPages');
 		let worker = await this.worker.getPages();
 
 		let result = [];
 		let pages: number = await worker.length;
 		for (let i = 0; i < pages; i++) {
 			let ar = await worker[i].aspectRatio;
-			let mapped = new PdfiumPage(i, worker[i], ar);
-			result[i] = mapped;
+			result[i] = new PdfiumPage(i, worker[i], ar);
 		}
 
 		return result;
@@ -150,11 +98,8 @@ export class PdfiumPage implements PdfPage {
 
 	async resized(width: number): Promise<void> {
 		if (this.canvas == null) return;
-		let label = `PdfiumPage (${this.index}): resized`;
 		let scale = width / this.canvas.width;
 		this.canvas.style.transformOrigin = `0 0`;
 		this.canvas.style.transform = `scale(${scale})`;
-		// this.canvas.width = width;
-		// this.canvas.height = width / this.aspectRatio;
 	}
 }

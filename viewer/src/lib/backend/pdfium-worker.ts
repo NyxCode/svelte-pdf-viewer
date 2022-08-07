@@ -1,22 +1,15 @@
-import init, {
-	initialize_pdfium_render,
-	PdfiumWasmDocument,
-	PdfiumWasmRenderer
-} from '../../../../pdfium/pkg/pdfium';
+import init, { initialize_pdfium_render, PdfiumWasmDocument, PdfiumWasmRenderer } from 'pdfium';
 import * as Comlink from 'comlink';
+import pdfium from './pdfium-js.js';
 
-function timeout(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function getWasmTable(): Promise<any> {
+function getWasmTable(pdfium: { wasmTable: () => any }): Promise<any> {
 	return new Promise((resolve, reject) => {
 		let max = 1000;
-		let duration = 100;
+		let duration = 10;
 		let waited = 0;
 
 		let interval = setInterval(() => {
-			let wasmTable = self['wasmTable'];
+			let wasmTable = pdfium.wasmTable();
 			if (wasmTable != undefined) {
 				clearInterval(interval);
 				console.error(`'wasmTable' found after ${waited}ms`);
@@ -38,13 +31,8 @@ class PdfiumWorkerBackend {
 	}
 
 	async initialize(): Promise<void> {
-		let pdfium = (await import('./pdfium-js.js')).default;
+		(<any>self).wasmTable = await getWasmTable(pdfium);
 
-		getWasmTable();
-
-		await timeout(100);
-
-		self.wasmTable = pdfium.wasmTable();
 		let initOut = await init();
 		initialize_pdfium_render(pdfium.Module, initOut, false);
 		this.renderer = new PdfiumWasmRenderer();
@@ -92,7 +80,7 @@ class PdfiumWorkerPage {
 
 	render(width: number): Promise<ImageData> {
 		console.error('rendering page', this.index);
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			this.doc.render_page(
 				this.index,
 				width,

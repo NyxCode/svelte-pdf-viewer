@@ -1,3 +1,8 @@
+// svelte-ignore *
+
+// auto-generated emscripten file
+// manually modified to make it an ES module
+
 var Module = typeof Module !== 'undefined' ? Module : {};
 var moduleOverrides = {};
 var key;
