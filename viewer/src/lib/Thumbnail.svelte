@@ -39,9 +39,7 @@
 	onMount(async () => {
 		visibilityObserver.observe(page.thumbnailElement);
 
-		await page.pdfThumbnail.initialize(wrapper);
-		await page.pdfThumbnail.resized(width);
-		//await page.pdfThumbnail.render(width);
+		await page.pdfThumbnail.initialize(wrapper, width);
 
 		return () => visibilityObserver.unobserve(page.thumbnailElement);
 	});

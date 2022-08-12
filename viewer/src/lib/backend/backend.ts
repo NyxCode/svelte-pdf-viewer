@@ -13,7 +13,7 @@ export interface PdfDocument {
 export interface PdfPage {
 	// called once when the page is initialized.
 	// No rendering should take place here.
-	initialize(element: HTMLDivElement): Promise<void>;
+	initialize(element: HTMLDivElement, width: number): Promise<void>;
 
 	// called when the page should be rendered.
 	// This happens when the page is visible, and was not previously rendered at the requested resolution.

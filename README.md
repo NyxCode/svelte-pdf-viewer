@@ -45,7 +45,7 @@
 - [ ] text layer
 - [ ] display title or filename
 - [ ] download
-- [ ] loading animation/indicator
+- [x] loading animation/indicator
 - [ ] print
 - [ ] rotate
 - [ ] progress bar

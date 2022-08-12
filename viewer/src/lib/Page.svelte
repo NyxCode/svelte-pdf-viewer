@@ -36,7 +36,7 @@
 
 	onMount(async () => {
 		currentPageObserver.observe(page.element);
-		await page.pdfPage.initialize(page.element!);
+		await page.pdfPage.initialize(page.element!, $pageWidth);
 		resize();
 
 		return () => currentPageObserver?.unobserve(page.element);

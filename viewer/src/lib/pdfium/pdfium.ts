@@ -87,10 +87,19 @@ export class PdfiumPage implements PdfPage {
 		this.aspectRatio = aspectRatio;
 	}
 
-	async initialize(element: HTMLDivElement): Promise<void> {
+	async initialize(element: HTMLDivElement, width: number): Promise<void> {
 		element.innerHTML = '';
 		this.canvas = document.createElement('canvas');
 		this.canvas.style.transformOrigin = `0 0`;
+
+		this.canvas.classList.add('bg-white', 'animate-pulse');
+
+		const height = Math.floor(width / this.aspectRatio);
+		this.width = width;
+		this.height = height;
+		this.canvas.width = width;
+		this.canvas.height = height;
+
 		element.appendChild(this.canvas);
 	}
 
@@ -115,6 +124,8 @@ export class PdfiumPage implements PdfPage {
 				console.info("Ignoring render, it's outdated");
 				return;
 			}
+
+			this.canvas!.className = '';
 
 			let ctx = this.canvas!.getContext('2d')!;
 			this.canvas!.style.transform = '';
