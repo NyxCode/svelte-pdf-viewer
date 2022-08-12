@@ -35,6 +35,7 @@
 </script>
 
 <input
+	aria-label="Current Page"
 	type="number"
 	class="mr-0 w-8 bg-zinc-900 rounded text-right pr-[3px]"
 	inputmode="numeric"

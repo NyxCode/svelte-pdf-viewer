@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { CONTEXT, slide } from './utils';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import type { Context } from './types';
 	import Thumbnail from './Thumbnail.svelte';
+	import { CurrentPageObserver } from './observers';
+	import { writable } from 'svelte/store';
 
 	const { pages, drawerWidth, currentPage } = getContext<Context>(CONTEXT);
-	const style = `
-	  width: ${drawerWidth}em;
-	  min-width: ${drawerWidth}em;
-	  max-width: ${drawerWidth}em;
-  `;
+	const shouldLoad = writable(new Set());
 
 	let wrapper: HTMLDivElement;
+	let visibilityObserver: CurrentPageObserver;
 
 	let lastCurrent = $currentPage;
 	$: {
@@ -39,16 +38,30 @@
 			wrapper.scrollTop = thumbnail.offsetTop;
 		}
 	}
+
+	onMount(() => {
+		visibilityObserver = new CurrentPageObserver(wrapper, writable(0), shouldLoad);
+
+		() => visibilityObserver.destroy();
+	});
 </script>
 
-<div transition:slide={{ em: drawerWidth }} {style} class="overflow-hidden">
+<div
+	transition:slide={{ em: drawerWidth }}
+	style:width="{drawerWidth}em"
+	style:min-width="{drawerWidth}em"
+	style:max-width="{drawerWidth}em"
+	class="overflow-hidden"
+>
 	<div
 		bind:this={wrapper}
 		class="h-full w-full overflow-auto thumbnails-scrollbar scroll-smooth
 					 bg-zinc-800 drop-shadow-lg z-10 pl-[16px]"
 	>
-		{#each $pages as page}
-			<Thumbnail on:goto {page} />
-		{/each}
+		{#if visibilityObserver != null}
+			{#each $pages as page}
+				<Thumbnail on:goto {page} {visibilityObserver} shouldRender={$shouldLoad.has(page.index)} />
+			{/each}
+		{/if}
 	</div>
 </div>

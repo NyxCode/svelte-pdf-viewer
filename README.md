@@ -25,21 +25,23 @@
 
 ## supported browsers
 - [x] **Chrome**
-- [ ] **Firefox** *(currently crashes after a few renders, possibly due to a memory leak)*
+- [x] **Firefox**
 
 ## why is it so slow?
 - [x] only render visible pages
-- [ ] only render visible thumbnails
+- [x] only render visible thumbnails
 - [ ] only render visible parts of pages when zooming
 - [x] pdfium: re-use bitmap buffer
 - [x] implement rendering queue to discard outdated requests
 - [x] pdfium: render asynchronous in a webworker
 - [ ] pdfium: pre-load pdfium
 - [x] preemptively render pages
-- [ ] preemptively render thumbnails
+- [x] preemptively render thumbnails
 - [ ] preload PDF
+- [ ] progressively load aspect ratios of pages instead of all at once
 
 ## todo
+- [ ] touch gestures
 - [ ] text layer
 - [ ] display title or filename
 - [ ] download
@@ -60,6 +62,7 @@
 ## bugs
 - [x] thumbnails sometimes render at the wrong size
 - [x] pages flicker on when zooming
+- [ ] Pages look blurry on high-DPI devices
 
 
 [^1]:  Currently, getting the thing to build is a pain due to the emscripten-generated `pdfium-js.js` and `pdfium.wasm`.  

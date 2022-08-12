@@ -35,11 +35,11 @@
 	}
 
 	onMount(async () => {
-		currentPageObserver.observe(page);
+		currentPageObserver.observe(page.element);
 		await page.pdfPage.initialize(page.element!);
 		resize();
 
-		return () => currentPageObserver?.unobserve(page);
+		return () => currentPageObserver?.unobserve(page.element);
 	});
 </script>
 

@@ -1,4 +1,3 @@
-import type { PageData } from './types';
 import type { Writable } from 'svelte/store';
 
 export class CurrentPageObserver {
@@ -28,12 +27,12 @@ export class CurrentPageObserver {
 		);
 	}
 
-	observe(page: PageData) {
-		this.observer.observe(page.element!);
+	observe(pageElement: HTMLElement) {
+		this.observer.observe(pageElement);
 	}
 
-	unobserve(page: PageData) {
-		this.observer.unobserve(page.element!);
+	unobserve(pageElement: HTMLElement) {
+		this.observer.unobserve(pageElement);
 	}
 
 	destroy() {
