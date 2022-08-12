@@ -195,6 +195,10 @@ function passArray8ToWasm0(arg, malloc) {
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
+
+function getArrayF64FromWasm0(ptr, len) {
+    return getFloat64Memory0().subarray(ptr / 8, ptr / 8 + len);
+}
 /**
 * Establishes a binding between an external Pdfium WASM module and `pdfium-render`'s WASM module.
 * This function should be called from Javascript once the external Pdfium WASM module has been loaded
@@ -282,27 +286,17 @@ export class PdfiumWasmDocument {
         wasm.__wbg_pdfiumwasmdocument_free(ptr);
     }
     /**
-    * @returns {number}
+    * @returns {Float64Array}
     */
-    pages() {
-        const ret = wasm.pdfiumwasmdocument_pages(this.ptr);
-        return ret;
-    }
-    /**
-    * @param {number} n
-    * @returns {PdfiumWasmPageSize}
-    */
-    page_size(n) {
+    aspect_ratios() {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.pdfiumwasmdocument_page_size(retptr, this.ptr, n);
+            wasm.pdfiumwasmdocument_aspect_ratios(retptr, this.ptr);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
-            var r2 = getInt32Memory0()[retptr / 4 + 2];
-            if (r2) {
-                throw takeObject(r1);
-            }
-            return PdfiumWasmPageSize.__wrap(r0);
+            var v0 = getArrayF64FromWasm0(r0, r1).slice();
+            wasm.__wbindgen_free(r0, r1 * 8);
+            return v0;
         } finally {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
@@ -310,69 +304,22 @@ export class PdfiumWasmDocument {
     /**
     * @param {number} n
     * @param {number} width_px
-    * @param {Function} callback
+    * @returns {Uint8ClampedArray}
     */
-    render_page(n, width_px, callback) {
+    render_page(n, width_px) {
         try {
             const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-            wasm.pdfiumwasmdocument_render_page(retptr, this.ptr, n, width_px, addHeapObject(callback));
+            wasm.pdfiumwasmdocument_render_page(retptr, this.ptr, n, width_px);
             var r0 = getInt32Memory0()[retptr / 4 + 0];
             var r1 = getInt32Memory0()[retptr / 4 + 1];
-            if (r1) {
-                throw takeObject(r0);
+            var r2 = getInt32Memory0()[retptr / 4 + 2];
+            if (r2) {
+                throw takeObject(r1);
             }
+            return takeObject(r0);
         } finally {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
-    }
-}
-/**
-*/
-export class PdfiumWasmPageSize {
-
-    static __wrap(ptr) {
-        const obj = Object.create(PdfiumWasmPageSize.prototype);
-        obj.ptr = ptr;
-
-        return obj;
-    }
-
-    __destroy_into_raw() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-
-        return ptr;
-    }
-
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_pdfiumwasmpagesize_free(ptr);
-    }
-    /**
-    * @returns {number}
-    */
-    get width() {
-        const ret = wasm.__wbg_get_pdfiumwasmpagesize_width(this.ptr);
-        return ret;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set width(arg0) {
-        wasm.__wbg_set_pdfiumwasmpagesize_width(this.ptr, arg0);
-    }
-    /**
-    * @returns {number}
-    */
-    get height() {
-        const ret = wasm.__wbg_get_pdfiumwasmpagesize_height(this.ptr);
-        return ret;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set height(arg0) {
-        wasm.__wbg_set_pdfiumwasmpagesize_height(this.ptr, arg0);
     }
 }
 /**
@@ -636,10 +583,6 @@ imports.wbg.__wbg_apply_769e865e14ecdbb0 = function() { return handleError(funct
 }, arguments) };
 imports.wbg.__wbg_call_65af9f665ab6ade5 = function() { return handleError(function (arg0, arg1, arg2) {
     const ret = getObject(arg0).call(getObject(arg1), getObject(arg2));
-    return addHeapObject(ret);
-}, arguments) };
-imports.wbg.__wbg_call_a51357fb7467f969 = function() { return handleError(function (arg0, arg1, arg2, arg3, arg4) {
-    const ret = getObject(arg0).call(getObject(arg1), getObject(arg2), getObject(arg3), getObject(arg4));
     return addHeapObject(ret);
 }, arguments) };
 imports.wbg.__wbg_length_8ddcef844d3ae61b = function(arg0) {

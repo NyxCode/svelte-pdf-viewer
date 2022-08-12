@@ -30,3 +30,52 @@ export function withoutClass(element: HTMLElement, clazz: string, callback: () =
 	callback();
 	element.classList.add(clazz);
 }
+
+export function debounce(f: () => void, t: number): () => void {
+	let timer: ReturnType<typeof setTimeout>;
+	return () => {
+		clearTimeout(timer);
+		timer = setTimeout(f, t);
+	};
+}
+
+export class Deferred<T> {
+	private value: T | null = null;
+	private listener: Array<(value: T) => void> = [];
+
+	static fromPromise<T>(p: Promise<T>): Deferred<T> {
+		let result = new Deferred<T>();
+		p.then((v) => result.set(v));
+		return result;
+	}
+
+	set(value: T) {
+		this.value = value;
+		let listener = this.listener;
+		this.listener = [];
+
+		listener.forEach((l) => l(value));
+	}
+
+	then(f: (value: T) => void) {
+		if (this.value != null) {
+			f(this.value);
+		} else {
+			this.listener.push(f);
+		}
+	}
+
+	get(): T | null {
+		return this.value;
+	}
+
+	promise(): Promise<T> {
+		if (this.value != null) {
+			return Promise.resolve(this.value);
+		}
+
+		return new Promise((resolve) => {
+			this.listener.push(resolve);
+		});
+	}
+}

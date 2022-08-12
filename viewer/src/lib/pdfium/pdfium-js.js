@@ -1,5 +1,3 @@
-// svelte-ignore *
-
 // auto-generated emscripten file
 // manually modified to make it an ES module
 

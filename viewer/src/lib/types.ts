@@ -1,5 +1,4 @@
 import type { Writable } from 'svelte/store';
-import type { SimpleResizeObserver } from './observers';
 import type { PdfDocument, PdfPage } from './backend/backend';
 import type Page from './Page.svelte';
 

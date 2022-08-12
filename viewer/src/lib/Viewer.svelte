@@ -6,7 +6,7 @@
 	import { onMount, setContext } from 'svelte';
 	import { writable } from 'svelte/store';
 	import type { Context, PageData } from './types';
-	import { PdfiumBackend } from './backend/pdfium';
+	import { PdfiumBackend } from './pdfium/pdfium';
 	import type { PdfDocument } from './backend/backend';
 
 	let drawer = true;

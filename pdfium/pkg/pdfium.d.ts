@@ -38,31 +38,15 @@ export function write_block_from_callback_wasm(param: number, buf: number, size:
 export class PdfiumWasmDocument {
   free(): void;
 /**
-* @returns {number}
+* @returns {Float64Array}
 */
-  pages(): number;
-/**
-* @param {number} n
-* @returns {PdfiumWasmPageSize}
-*/
-  page_size(n: number): PdfiumWasmPageSize;
+  aspect_ratios(): Float64Array;
 /**
 * @param {number} n
 * @param {number} width_px
-* @param {Function} callback
+* @returns {Uint8ClampedArray}
 */
-  render_page(n: number, width_px: number, callback: Function): void;
-}
-/**
-*/
-export class PdfiumWasmPageSize {
-  free(): void;
-/**
-*/
-  height: number;
-/**
-*/
-  width: number;
+  render_page(n: number, width_px: number): Uint8ClampedArray;
 }
 /**
 */
@@ -88,14 +72,8 @@ export interface InitOutput {
   readonly pdfiumwasmrenderer_new: (a: number, b: number, c: number) => void;
   readonly pdfiumwasmrenderer_load_document: (a: number, b: number, c: number, d: number) => void;
   readonly __wbg_pdfiumwasmdocument_free: (a: number) => void;
-  readonly pdfiumwasmdocument_pages: (a: number) => number;
-  readonly pdfiumwasmdocument_page_size: (a: number, b: number, c: number) => void;
-  readonly pdfiumwasmdocument_render_page: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly __wbg_pdfiumwasmpagesize_free: (a: number) => void;
-  readonly __wbg_get_pdfiumwasmpagesize_width: (a: number) => number;
-  readonly __wbg_set_pdfiumwasmpagesize_width: (a: number, b: number) => void;
-  readonly __wbg_get_pdfiumwasmpagesize_height: (a: number) => number;
-  readonly __wbg_set_pdfiumwasmpagesize_height: (a: number, b: number) => void;
+  readonly pdfiumwasmdocument_aspect_ratios: (a: number, b: number) => void;
+  readonly pdfiumwasmdocument_render_page: (a: number, b: number, c: number, d: number) => void;
   readonly initialize_pdfium_render: (a: number, b: number, c: number) => number;
   readonly read_block_from_callback_wasm: (a: number, b: number, c: number, d: number) => number;
   readonly write_block_from_callback_wasm: (a: number, b: number, c: number) => number;

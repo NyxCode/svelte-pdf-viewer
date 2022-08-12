@@ -22,6 +22,7 @@ export class CurrentPageObserver {
 			},
 			{
 				root: wrapper,
+				rootMargin: '25% 0%',
 				threshold: [0, 0.2, 0.4, 0.6, 0.8, 1]
 			}
 		);

@@ -4,6 +4,21 @@
 
 ## [demo](https://svelte-pdf-viewer.nyxcode.com/)
 
+## goals
+- [ ] Fast  
+  - [ ] Fast renders 
+  - [ ] Smooth scrolling / zooming / panning
+  - [ ] Fast initial load
+    - [ ] SSR of PDFs
+- [ ] Embeddable
+  - [ ] Directly embed in a svelte app
+  - [ ] Using `<iframe />`
+- [ ] Customizable
+  - [ ] themeable
+- [ ] Extensible
+  - [ ] Custom annotations
+  - [ ] Plug-and-play renderers
+
 ## supported renderers
 - [x] **Pdfium** *(using WASM through [pdfium-render](https://github.com/ajrcarey/pdfium-render))*
 - [ ] **PDF.js**
@@ -17,10 +32,11 @@
 - [ ] only render visible thumbnails
 - [ ] only render visible parts of pages when zooming
 - [x] pdfium: re-use bitmap buffer
-- [ ] implement rendering queue to discard outdated requests
+- [x] implement rendering queue to discard outdated requests
 - [x] pdfium: render asynchronous in a webworker
 - [ ] pdfium: pre-load pdfium
-- [ ] preemptively render pages / thumbnails
+- [x] preemptively render pages
+- [ ] preemptively render thumbnails
 - [ ] preload PDF
 
 ## todo
