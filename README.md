@@ -58,13 +58,16 @@
 - [ ] make extendable 
 - [ ] annotations
 - [ ] streamline build [^1]
+- [ ] investigate render quality [^2]
+- [ ] re-render if device pixel ratio changes
 
 ## bugs
 - [x] thumbnails sometimes render at the wrong size
 - [x] pages flicker on when zooming
-- [ ] Pages look blurry on high-DPI devices
+- [x] Pages look blurry on high-DPI devices
 
 
 [^1]:  Currently, getting the thing to build is a pain due to the emscripten-generated `pdfium-js.js` and `pdfium.wasm`.  
   `pdfium.wasm` is duplicated, once in `src/lib/backend/` and once in `/static/assets` since vite seems to be fine with 
-  the first one (in dev), but rollup needs the 2nd one (when building).
+  the first one (in dev), but rollup needs the 2nd one (when building).  
+[^2]: Is the render quality as good as it could be? What causes the slight misalignment when zooming? Are there weird rounding errors?

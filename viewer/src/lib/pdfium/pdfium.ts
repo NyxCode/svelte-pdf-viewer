@@ -79,7 +79,15 @@ export class PdfiumPage implements PdfPage {
 	readonly aspectRatio: number;
 
 	private width: number = -Infinity;
-	private height: number = -Infinity;
+	private get height() {
+		return Math.floor(this.width / this.aspectRatio);
+	}
+	private get pixelWidth() {
+		return this.width * (window.devicePixelRatio || 1);
+	}
+	private get pixelHeight() {
+		return this.height * (window.devicePixelRatio || 1);
+	}
 
 	constructor(backend: PdfiumBackend, page: number, aspectRatio: number) {
 		this.backend = backend;
@@ -94,16 +102,20 @@ export class PdfiumPage implements PdfPage {
 
 		this.canvas.classList.add('bg-white', 'animate-pulse');
 
-		const height = Math.floor(width / this.aspectRatio);
 		this.width = width;
-		this.height = height;
-		this.canvas.width = width;
-		this.canvas.height = height;
+		this.setCanvasSize();
 
 		element.appendChild(this.canvas);
 	}
 
-	async render(width: number): Promise<void> {
+	private setCanvasSize() {
+		this.canvas!.style.width = this.width + 'px';
+		this.canvas!.style.height = this.height + 'px';
+		this.canvas!.width = this.pixelWidth;
+		this.canvas!.height = this.pixelHeight;
+	}
+
+	async render(): Promise<void> {
 		if (this.canvas == null) return;
 
 		let result = <WorkerMessages.RenderPageResponse>(
@@ -111,7 +123,7 @@ export class PdfiumPage implements PdfPage {
 				type: 'render-page',
 				context: this.context,
 				page: this.page,
-				width: width
+				width: this.pixelWidth
 			})
 		);
 
@@ -120,7 +132,7 @@ export class PdfiumPage implements PdfPage {
 				console.warn('Render aborted:', result.error);
 				return;
 			}
-			if (Math.abs(this.width - result.width) > Number.EPSILON) {
+			if (Math.abs(this.pixelWidth - result.width) > Number.EPSILON) {
 				console.info("Ignoring render, it's outdated");
 				return;
 			}
@@ -129,19 +141,17 @@ export class PdfiumPage implements PdfPage {
 
 			let ctx = this.canvas!.getContext('2d')!;
 			this.canvas!.style.transform = '';
-			this.canvas!.width = this.width;
-			this.canvas!.height = this.height;
+			this.setCanvasSize();
 			ctx.putImageData(result.data, 0, 0, 0, 0, result.width, result.height);
 		});
 	}
 
 	async resized(width: number): Promise<void> {
 		if (this.canvas == null) return;
-		let scale = width / this.canvas.width;
+		width = Math.floor(width);
+		let scale = width / (this.canvas.width / (window.devicePixelRatio || 1));
 		this.canvas.style.transform = `scale(${scale})`;
-
-		this.width = width;
-		this.height = width / this.aspectRatio;
+		this.width = Math.floor(width);
 	}
 }
 

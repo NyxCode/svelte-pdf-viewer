@@ -59,7 +59,7 @@
 					 bg-zinc-800 drop-shadow-lg z-10 pl-[16px]"
 	>
 		{#if visibilityObserver != null}
-			{#each $pages as page}
+			{#each $pages as page (page.index)}
 				<Thumbnail on:goto {page} {visibilityObserver} shouldRender={$shouldLoad.has(page.index)} />
 			{/each}
 		{/if}

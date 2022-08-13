@@ -46,6 +46,6 @@
 <div
 	data-page-index={page.index}
 	bind:this={page.element}
-	class="mx-auto my-3"
+	class="mx-auto my-3 pl-[8px]"
 	on:dragstart|preventDefault
 />

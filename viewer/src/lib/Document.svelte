@@ -45,7 +45,7 @@
 	class="flex flex-col w-full max-w-full overflow-auto pages-scrollbar scroll-smooth"
 >
 	{#if currentPageObserver != null}
-		{#each $pages as page}
+		{#each $pages as page (page.index)}
 			<Page bind:this={page.component} bind:page {currentPageObserver} />
 		{/each}
 	{/if}

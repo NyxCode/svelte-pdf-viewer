@@ -1,4 +1,5 @@
 import { quintOut } from 'svelte/easing';
+import { type Readable, writable } from 'svelte/store';
 
 export const CONTEXT = Symbol('svelte-pdf-viewer');
 
@@ -78,4 +79,17 @@ export class Deferred<T> {
 			this.listener.push(resolve);
 		});
 	}
+}
+
+export function devicePixelRatio(): Readable<number> {
+	const inner = writable(0);
+
+	const onChange = () => {
+		const pr = window.devicePixelRatio;
+		inner.set(pr);
+		matchMedia(`(resolution: ${pr}dppx)`).addEventListener('change', onChange, { once: true });
+	};
+	onChange();
+
+	return inner;
 }
